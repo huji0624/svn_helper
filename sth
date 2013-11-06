@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-hp="sth cmd patten [--pipe]"
+hp="usage():\n\tsth cmd patten [--pipe]"
 
 import sys
 
