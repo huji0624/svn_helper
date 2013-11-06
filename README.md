@@ -13,13 +13,13 @@ You can use sth just like svn command but use svn st info as the input source in
 
 Use svn st and you can see these infomation on terminal:
 
-M     	A
-M       B
-?       C
-?       D
-M       E
-?       F
-M       G
+M     	A  
+M       B  
+?       C  
+?       D  
+M       E  
+?       F  
+M       G  
 
 Example 1,revert B:
 sth revert M1
