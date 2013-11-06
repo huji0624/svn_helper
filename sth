@@ -1,0 +1,125 @@
+#!/usr/bin/python
+
+hp="sth cmd patten [--pipe]"
+
+import sys
+
+def getoptof(opt):
+	if opt in sys.argv:
+		index = sys.argv.index(opt)
+		pindex = index+1
+		if pindex<len(sys.argv):
+			return sys.argv[pindex]
+		else:
+			return None
+	else:
+		return None
+
+def getOpts():
+	opts=list()
+	for t in sys.argv:
+		if t!="--pipe" and ((len(t)==2 and t.startswith("-") and t[1].isalpha()) or t.startswith("--")):
+			opts.append(t)
+			ARG=getoptof(t)
+			if ARG!=None :
+				opts.append(ARG)
+	return opts
+
+def parsePatten(patten):
+	temp=list()
+	if patten[0]=="-" or patten[0].isdigit():
+		index=int(patten)
+		pd=dict()
+		pd['index']=index
+		temp.append(pd)
+	elif patten[0].isdigit() == False:
+		pd=dict()
+		pd['state']=patten[0]
+		pd['index']=int(patten[1:])
+		temp.append(pd)
+	else:
+		print "Wrong Patten"
+		exit(1)
+
+	return temp
+
+def getPath(state,index,stdicts):
+	if state == None:
+		return stdicts[index]['path']
+	else:
+		sc=0
+		for sd in stdicts:
+			if state == sd['state']:
+				if index == sc:
+					return sd['path']
+				else:
+					sc=sc+1
+		print 'index is out of bounds'
+		exit(1)
+	return None
+
+def parseSvnStString(ststr):
+	stdicts=list()
+	ststrs=ststr.splitlines()
+	lineC=0
+	for line in ststrs:
+		tokens=line.split()
+		stdict=dict()
+		stdict['state']=tokens[0].strip()
+		stdict['path']=tokens[1].strip()
+		stdict['index']=lineC
+		stdicts.append(stdict)
+		lineC=lineC+1
+	return stdicts
+
+if len(sys.argv)<3:
+	print hp
+	exit(1)
+
+cmd=sys.argv[1]
+opts=getOpts()
+pattens=sys.argv[-1]
+
+pathes=list()
+pds=list()
+
+pattenslist=pattens.split(",")
+for tp in pattenslist:
+	if tp=="":
+		continue
+	else:
+		pdl=parsePatten(tp)
+		pds.extend(pdl)
+
+ststr=None
+if '--pipe' in sys.argv:
+#read from input pipe
+	ststr=sys.stdin.read()
+else:
+#read from svn st pipe
+	import os
+	pipe=os.popen("svn st")
+	ststr=pipe.read()
+	pipe.close()
+
+stdicts=parseSvnStString(ststr)
+for pd in pds:
+	if pd.has_key('state') and pd.has_key('index'):
+		state=pd['state']
+		index=pd['index']
+		pathes.append(getPath(state,index,stdicts))
+	elif pd.has_key('index'):
+		index=pd['index']
+		pathes.append(getPath(None,index,stdicts))
+	else:
+		print 'No Patten Found'
+		exit(1)
+
+import os
+svncmd="svn "+cmd+" "
+for opt in opts:
+	svncmd=svncmd+opt+" "
+for path in pathes:
+	svncmd=svncmd+path+" "
+os.system(svncmd)
+exit(0)
