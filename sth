@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-hp="usage():\n\tsth cmd patten [--pipe]"
+hp="usage():\n\tsth cmd -p patten [--pipe] [-h]\n\tgithub page:https://github.com/huji0624/svn_helper"
 
 import sys
 
@@ -17,28 +17,62 @@ def getoptof(opt):
 
 def getOpts():
 	opts=list()
+	isPatten=False
 	for t in sys.argv:
-		if t!="--pipe" and ((len(t)==2 and t.startswith("-") and t[1].isalpha()) or t.startswith("--")):
+		if isPatten:
+			isPatten=False
+			continue
+
+		if t == '--pipe':
+			continue
+		elif t == '-p':
+			isPatten=True
+			continue
+		elif t == sys.argv[0]:
+			continue
+		else:
 			opts.append(t)
-			ARG=getoptof(t)
-			if ARG!=None :
-				opts.append(ARG)
 	return opts
+
+def parseParts(state,partspatten,temp):
+	parts=partspatten.split(":")
+	if len(parts)==1:
+		index=int(patten)
+		pd=dict()
+		pd['index']=index
+		if state:
+			pd['state']=state
+		temp.append(pd)
+	elif len(parts)==2:
+		if parts[0]=='':
+			parts[0]='0'
+		if parts[1]=='':
+			parts[1]='-1'
+		findex=int(parts[0])
+		sindex=int(parts[1])
+		if findex>sindex:
+			t=findex
+			findex=sindex
+			sindex=findex
+		for i in range(findex,sindex):
+			pd=dict()
+			pd['index']=i
+			if state:
+				pd['state']=state
+			temp.append(pd)
+	else:
+		print "Wrong Patten:"+patten
+		exit(1)
 
 def parsePatten(patten):
 	temp=list()
 	if patten[0]=="-" or patten[0].isdigit():
-		index=int(patten)
-		pd=dict()
-		pd['index']=index
-		temp.append(pd)
+		parseParts(None,patten,temp)
 	elif patten[0].isdigit() == False:
-		pd=dict()
-		pd['state']=patten[0]
-		pd['index']=int(patten[1:])
-		temp.append(pd)
+		commonstate=patten[0]
+		parseParts(commonstate,patten[1:],temp)
 	else:
-		print "Wrong Patten"
+		print "Wrong Patten:"+patten
 		exit(1)
 
 	return temp
@@ -60,25 +94,43 @@ def getPath(state,index,stdicts):
 
 def parseSvnStString(ststr):
 	stdicts=list()
+	stateCount=dict()
 	ststrs=ststr.splitlines()
 	lineC=0
 	for line in ststrs:
 		tokens=line.split()
 		stdict=dict()
-		stdict['state']=tokens[0].strip()
+		tstate=tokens[0].strip()
+		stdict['state']=tstate
 		stdict['path']=tokens[1].strip()
 		stdict['index']=lineC
 		stdicts.append(stdict)
+		if stateCount.has_key(tstate):
+			count=stateCount[tstate]+1
+			stateCount[tstate]=count
+		else:
+			stateCount[tstate]=1
 		lineC=lineC+1
-	return stdicts
+	return (stdicts,stateCount)
 
-if len(sys.argv)<3:
+def nToP(pds,stateCount,total):
+	for pd in pds:
+		if pd.has_key("index") and pd.has_key("state"):
+			state=pd["state"]
+			index=pd["index"]
+			if index<0:
+				pd["index"]=index+stateCount[state]
+
+if len(sys.argv)<3 or ('-h' in sys.argv):
 	print hp
 	exit(1)
 
 cmd=sys.argv[1]
 opts=getOpts()
-pattens=sys.argv[-1]
+pattens=getoptof("-p")
+if pattens == None or pattens == "":
+	print "No Patten Found"
+	exit(1)
 
 pathes=list()
 pds=list()
@@ -102,7 +154,8 @@ else:
 	ststr=pipe.read()
 	pipe.close()
 
-stdicts=parseSvnStString(ststr)
+stdicts,stateCount=parseSvnStString(ststr)
+nToP(pds,stateCount,total)
 for pd in pds:
 	if pd.has_key('state') and pd.has_key('index'):
 		state=pd['state']

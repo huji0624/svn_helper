@@ -22,25 +22,25 @@ M       E
 M       G  
 
 Example 1,revert B:
-sth revert M1
+sth revert M1 or sth revert -p 1
 
 Example 2,revert G:
-sth revert M-1
+sth revert M-1 or sth revert -p -1
 
 Example 3,revert A and B:
-sth revert M0:1
+sth revert -p M0:1
 or
-sth revert M0,M1
+sth revert -p M0,M1
 
 Example 4,revert All M state file after B:
-sth revert M1:
+sth revert -p M1:
 
 Example 5,revert All M state file before E:
-sth revert M:-2
+sth revert -p M:-2
 
 And More!
 =========
 sth can be used along with pipe when you specified --pipe
 
 Example:
-svn st | grep user | sth add ?2
+svn st | grep user | sth --pipe add -p ?2
