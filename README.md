@@ -22,10 +22,10 @@ M       E
 M       G  
 
 Example 1,revert B:
-sth revert M1 or sth revert -p 1
+sth revert -p M1 or sth revert -p 1
 
 Example 2,revert G:
-sth revert M-1 or sth revert -p -1
+sth revert -p M-1 or sth revert -p -1
 
 Example 3,revert A and B:
 sth revert -p M0:1

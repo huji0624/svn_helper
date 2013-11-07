@@ -37,7 +37,7 @@ def getOpts():
 def parseParts(state,partspatten,temp):
 	parts=partspatten.split(":")
 	if len(parts)==1:
-		index=int(patten)
+		index=int(partspatten)
 		pd=dict()
 		pd['index']=index
 		if state:
@@ -51,17 +51,15 @@ def parseParts(state,partspatten,temp):
 		findex=int(parts[0])
 		sindex=int(parts[1])
 		if findex>sindex:
-			t=findex
-			findex=sindex
-			sindex=findex
-		for i in range(findex,sindex):
-			pd=dict()
-			pd['index']=i
-			if state:
-				pd['state']=state
-			temp.append(pd)
+			print "Wrong index:"+partspatten
+			exit(1)
+		pd['from']=findex
+		pd['to']=sindex
+		if state:
+			pd['state']=state
+		temp.append(pd)
 	else:
-		print "Wrong Patten:"+patten
+		print "Wrong Patten:"+partspatten
 		exit(1)
 
 def parsePatten(patten):
@@ -143,6 +141,9 @@ for tp in pattenslist:
 		pdl=parsePatten(tp)
 		pds.extend(pdl)
 
+#for debug
+print pds
+
 ststr=None
 if '--pipe' in sys.argv:
 #read from input pipe
@@ -155,18 +156,26 @@ else:
 	pipe.close()
 
 stdicts,stateCount=parseSvnStString(ststr)
-nToP(pds,stateCount,total)
+nToP(pds,stateCount,len(stdicts))
 for pd in pds:
 	if pd.has_key('state') and pd.has_key('index'):
 		state=pd['state']
 		index=pd['index']
 		pathes.append(getPath(state,index,stdicts))
+	elif pd.has_key('from') and pd.has_key('to'):
+		state=pd['state']if pd.has_key('state') else None
+		for i in range(pd['from'],pd['to']+1):
+			pathes.append(getPath(state,i,stdicts))
 	elif pd.has_key('index'):
 		index=pd['index']
 		pathes.append(getPath(None,index,stdicts))
 	else:
 		print 'No Patten Found'
 		exit(1)
+
+#for debug
+print pathes
+exit(1)
 
 import os
 svncmd="svn "+cmd+" "
