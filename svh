@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-hp="usage():\n\tsth cmd -p patten [--pipe] [-h]\n\tgithub page:https://github.com/huji0624/svn_helper"
+hp="usage():\n\tsvh cmd -p patten [--pipe] [-h]\n\tgithub page:https://github.com/huji0624/svn_helper"
 
 import sys
 

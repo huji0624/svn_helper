@@ -9,7 +9,7 @@ sh install.sh
 
 How to Use
 ==========
-You can use sth just like svn command but use svn st info as the input source instead of certain path.
+You can use svh just like svn command but use svn st info as the input source instead of certain path.
 
 Use svn st and you can see these infomation on terminal:
 
@@ -22,25 +22,25 @@ M       E
 M       G  
 
 Example 1,revert B:
-sth revert -p M1 or sth revert -p 1
+svh revert -p M1 or svh revert -p 1
 
 Example 2,revert G:
-sth revert -p M-1 or sth revert -p -1
+svh revert -p M-1 or svh revert -p -1
 
 Example 3,revert A and B:
-sth revert -p M0:1
+svh revert -p M0:1
 or
-sth revert -p M0,M1
+svh revert -p M0,M1
 
 Example 4,revert All M state file after B:
-sth revert -p M1:
+svh revert -p M1:
 
 Example 5,revert All M state file before E:
-sth revert -p M:-2
+svh revert -p M:-2
 
 And More!
 =========
-sth can be used along with pipe when you specified --pipe
+svh can be used along with pipe when you specified --pipe
 
 Example:
-svn st | grep user | sth --pipe add -p ?2
+svn st | grep user | svh --pipe add -p ?2
