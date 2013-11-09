@@ -50,9 +50,7 @@ def parseParts(state,partspatten,temp):
 			parts[1]='-1'
 		findex=int(parts[0])
 		sindex=int(parts[1])
-		if findex>sindex:
-			print "Wrong index:"+partspatten
-			exit(1)
+		pd=dict()
 		pd['from']=findex
 		pd['to']=sindex
 		if state:
@@ -118,6 +116,15 @@ def nToP(pds,stateCount,total):
 			index=pd["index"]
 			if index<0:
 				pd["index"]=index+stateCount[state]
+		elif pd.has_key("from") and pd.has_key("to") and pd.has_key("state"):
+			state=pd["state"]
+			fromindex=pd["from"]
+			toindex=pd["to"]
+			if fromindex<0:
+				pd["from"]=fromindex+stateCount[state]
+			if toindex<0:
+				pd["to"]=toindex+stateCount[state]
+
 
 if len(sys.argv)<3 or ('-h' in sys.argv):
 	print hp
@@ -142,7 +149,7 @@ for tp in pattenslist:
 		pds.extend(pdl)
 
 #for debug
-print pds
+#print pds
 
 ststr=None
 if '--pipe' in sys.argv:
@@ -164,6 +171,9 @@ for pd in pds:
 		pathes.append(getPath(state,index,stdicts))
 	elif pd.has_key('from') and pd.has_key('to'):
 		state=pd['state']if pd.has_key('state') else None
+		if pd['from']>pd['to']:
+			print "Wrong index:from>to"
+			exit(1)
 		for i in range(pd['from'],pd['to']+1):
 			pathes.append(getPath(state,i,stdicts))
 	elif pd.has_key('index'):
@@ -174,8 +184,8 @@ for pd in pds:
 		exit(1)
 
 #for debug
-print pathes
-exit(1)
+#print pathes
+#exit(1)
 
 import os
 svncmd="svn "+cmd+" "
