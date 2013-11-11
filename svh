@@ -18,20 +18,25 @@ def getoptof(opt):
 def getOpts():
 	opts=list()
 	isPatten=False
+	needQuote=False
 	for t in sys.argv:
 		if isPatten:
 			isPatten=False
 			continue
+		if needQuote:
+			t="\""+t+"\""
+			needQuote=False
 
 		if t == '--pipe':
 			continue
+		elif t == '-m':
+			needQuote=True
 		elif t == '-p':
 			isPatten=True
 			continue
 		elif t == sys.argv[0]:
 			continue
-		else:
-			opts.append(t)
+		opts.append(t)
 	return opts
 
 def parseParts(state,partspatten,temp):
@@ -192,5 +197,8 @@ for opt in opts:
 	svncmd=svncmd+opt+" "
 for path in pathes:
 	svncmd=svncmd+path+" "
+#for debug
+#print svncmd
+#exit(1)
 os.system(svncmd)
 exit(0)
