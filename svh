@@ -130,7 +130,6 @@ if len(sys.argv)<3 or ('-h' in sys.argv):
 	print hp
 	exit(1)
 
-cmd=sys.argv[1]
 opts=getOpts()
 pattens=getoptof("-p")
 if pattens == None or pattens == "":
@@ -188,7 +187,7 @@ for pd in pds:
 #exit(1)
 
 import os
-svncmd="svn "+cmd+" "
+svncmd="svn "
 for opt in opts:
 	svncmd=svncmd+opt+" "
 for path in pathes:
